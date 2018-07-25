@@ -8,6 +8,7 @@
 
 import UIKit
 import Firebase
+import ChameleonFramework
 
 class ChatViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate {
    
@@ -46,6 +47,8 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
         //TODO: Retrieve the messages
         retrieveMessages()
         
+        //TODO: Set Separator Style
+        messageTableView.separatorStyle = .none
     }
 
     ///////////////////////////////////////////
@@ -64,6 +67,15 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
         cell.messageBody.text = message.messageBody
         cell.senderUsername.text = message.sender
         cell.avatarImageView.image = UIImage(named: "egg")
+        
+        if cell.senderUsername.text == Auth.auth().currentUser?.email {
+            cell.avatarImageView.backgroundColor = UIColor.flatMint()
+            cell.messageBody.backgroundColor = UIColor.flatMaroon()
+        } else {
+            cell.avatarImageView.backgroundColor = UIColor.flatCoffee()
+            cell.messageBody.backgroundColor = UIColor.flatGray()
+        }
+        
         
         return cell
     }
