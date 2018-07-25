@@ -12,7 +12,7 @@ import Firebase
 class ChatViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate {
    
     // Declare instance variables here
-
+    var messageArray:[Message] = [Message]()
     
     // We've pre-linked the IBOutlets
     @IBOutlet var heightConstraint: NSLayoutConstraint!
@@ -43,20 +43,27 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
         //TODO: Configure Table View Cell Height
         configureTableView()
         
+        //TODO: Retrieve the messages
+        retrieveMessages()
+        
     }
 
     ///////////////////////////////////////////
     
     //MARK: - TableView DataSource Methods
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 3
+        return messageArray.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "customMessageCell", for: indexPath) as! CustomMessageCell
         
-        cell.messageBody.text = messageArray[indexPath.row]
+        let message = messageArray[indexPath.row]
+        
+        cell.messageBody.text = message.messageBody
+        cell.senderUsername.text = message.sender
+        cell.avatarImageView.image = UIImage(named: "egg")
         
         return cell
     }
@@ -134,7 +141,27 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     //TODO: Create the retrieveMessages method here:
-    
+    func retrieveMessages() {
+        
+        let messagesDB = Database.database().reference().child("Messages")
+        
+        messagesDB.observe(.childAdded) { (snapshot) in
+            
+            let snapshotValue = snapshot.value as! Dictionary<String, String>
+            
+            let text = snapshotValue["MessageBody"]!
+            let sender = snapshotValue["Sender"]!
+            
+            let message = Message()
+            message.messageBody = text
+            message.sender = sender
+            
+            self.messageArray.append(message)
+            
+            self.configureTableView()
+            self.messageTableView.reloadData()
+        }
+    }
     
 
     
